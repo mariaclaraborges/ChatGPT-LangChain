@@ -1,162 +1,99 @@
-# First Time Setup
+# ChatGPT-LangChain PDF App
 
-## Using Pipenv [Recommended]
+## Visão Geral
 
-```
-# Install dependencies
-pipenv install
+Este projeto é uma aplicação completa para análise, busca e chat com PDFs, integrando IA generativa (OpenAI), armazenamento vetorial (Pinecone), banco de dados SQL, interface web (Svelte) e processamento assíncrono (Celery). Ele permite que usuários façam upload de PDFs, gerem embeddings, realizem buscas semânticas e conversem com o conteúdo dos documentos.
 
-# Create a virtual environment
-pipenv shell
+---
 
-# Initialize the database
-flask --app app.web init-db
+## Principais Funcionalidades
 
-```
+- **Upload e Gerenciamento de PDFs:**  
+  Usuários podem enviar PDFs, que são processados e armazenados para análise posterior.
 
-## Using Venv [Optional]
+- **Geração de Embeddings:**  
+  O texto dos PDFs é extraído, dividido em chunks e convertido em embeddings usando modelos da OpenAI.
 
-These instructions are included if you wish to use venv to manage your evironment and dependencies instead of Pipenv.
+- **Armazenamento Vetorial (Pinecone):**  
+  Os embeddings são armazenados no Pinecone, permitindo buscas semânticas rápidas e filtradas por documento.
 
-```
-# Create the venv virtual environment
-python -m venv .venv
+- **Busca e Chat com PDFs:**  
+  Usuários podem fazer perguntas sobre o conteúdo dos PDFs. O sistema busca os chunks mais relevantes e utiliza um LLM (ChatOpenAI) para gerar respostas contextuais.
 
-# On MacOS, WSL, Linux
-source .venv/bin/activate
+- **Memória de Conversa Persistente:**  
+  O histórico de conversas é salvo em banco SQL, permitindo continuidade e contexto em múltiplas sessões.
 
-# On Windows
-.\.venv\Scripts\activate
+- **Interface Web Moderna:**  
+  Frontend em Svelte, com autenticação, visualização de PDFs, chat, dashboards e gerenciamento de documentos.
 
-# Install dependencies
-pip install -r requirements.txt
+- **Processamento Assíncrono:**  
+  Tarefas pesadas (como geração de embeddings) são processadas em background usando Celery.
 
-# Initialize the database
-flask --app app.web init-db
-```
+---
 
-# Running the app [Pipenv]
+## Estrutura de Pastas
 
-There are three separate processes that need to be running for the app to work: the server, the worker, and Redis.
+- **app/**  
+  Backend Python (Flask, LangChain, Celery, Pinecone, SQL, APIs, lógica de chat, embeddings, memories, etc.)
 
-If you stop any of these processes, you will need to start them back up!
+- **client/**  
+  Frontend Svelte (componentes, rotas, autenticação, chat, visualização de PDFs, etc.)
 
-Commands to start each are listed below. If you need to stop them, select the terminal window the process is running in and press Control-C
+- **instance/**  
+  Banco de dados SQLite.
 
-### To run the Python server
+- **static/**  
+  Arquivos estáticos (favicon, specs, etc.)
 
-Open a new terminal window and create a new virtual environment:
+---
 
-```
-pipenv shell
-```
+## Principais Tecnologias
 
-Then:
+- **Python 3.11**
+- **Flask** (API backend)
+- **LangChain** (orquestração de LLMs, chains, retrievers, memories)
+- **OpenAI** (embeddings, chat)
+- **Pinecone** (vector store)
+- **Celery** (tarefas assíncronas)
+- **Svelte** (frontend)
+- **SQLite** (banco de dados)
+- **Redis** (opcional, para filas/tarefas)
 
-```
-inv dev
-```
+---
 
-### To run the worker
+## Fluxo Básico
 
-Open a new terminal window and create a new virtual environment:
+1. **Upload do PDF:**  
+   Usuário faz upload via interface web.
 
-```
-pipenv shell
-```
+2. **Processamento:**  
+   O backend extrai o texto, divide em chunks, gera embeddings e armazena no Pinecone.
 
-Then:
+3. **Chat/Busca:**  
+   Usuário faz perguntas sobre o PDF. O sistema busca os chunks relevantes, envia para o LLM e retorna a resposta.
 
-```
-inv devworker
-```
+4. **Memória:**  
+   O histórico da conversa é salvo e pode ser recuperado em sessões futuras.
 
-### To run Redis
+---
 
-```
-redis-server
-```
+## Como Rodar
 
-### To reset the database
+1. Instale as dependências (use `pipenv install` ou `pip install -r requirements.txt`).
+2. Configure as variáveis de ambiente no `.env` (OpenAI, Pinecone, etc.).
+3. Inicie o backend Flask e o worker Celery.
+4. Inicie o frontend Svelte.
+5. Acesse a interface web para usar o sistema.
 
-Open a new terminal window and create a new virtual environment:
+---
 
-```
-pipenv shell
-```
+## Observações de Segurança
 
-Then:
+- **NUNCA** suba arquivos `.env` ou chaves de API para o GitHub.
+- Use `.gitignore` para proteger arquivos sensíveis e dados grandes.
 
-```
-flask --app app.web init-db
-```
+---
 
-# Running the app [Venv]
+## Créditos
 
-_These instructions are included if you wish to use venv to manage your evironment and dependencies instead of Pipenv._
-
-There are three separate processes that need to be running for the app to work: the server, the worker, and Redis.
-
-If you stop any of these processes, you will need to start them back up!
-
-Commands to start each are listed below. If you need to stop them, select the terminal window the process is running in and press Control-C
-
-### To run the Python server
-
-Open a new terminal window and create a new virtual environment:
-
-```
-# On MacOS, WSL, Linux
-source .venv/bin/activate
-
-# On Windows
-.\.venv\Scripts\activate
-```
-
-Then:
-
-```
-inv dev
-```
-
-### To run the worker
-
-Open a new terminal window and create a new virtual environment:
-
-```
-# On MacOS, WSL, Linux
-source .venv/bin/activate
-
-# On Windows
-.\.venv\Scripts\activate
-```
-
-Then:
-
-```
-inv devworker
-```
-
-### To run Redis
-
-```
-redis-server
-```
-
-### To reset the database
-
-Open a new terminal window and create a new virtual environment:
-
-```
-# On MacOS, WSL, Linux
-source .venv/bin/activate
-
-# On Windows
-.\.venv\Scripts\activate
-```
-
-Then:
-
-```
-flask --app app.web init-db
-```
+Projeto baseado em LangChain, OpenAI, Pinecone, Flask, Svelte e
